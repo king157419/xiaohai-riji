@@ -1,0 +1,9 @@
+{
+  "name": "xiaohai-riji",
+  "version": "1.0.0",
+  "private": true,
+  "description": "小孩日记：过一遍普通的一天，睡前看看你心里那个小孩怎么写今天。纯前端，零依赖。",
+  "scripts": {
+    "test": "node --test"
+  }
+}
