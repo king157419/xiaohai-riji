@@ -41,6 +41,29 @@ test('脸都是 8×8', () => {
   }
 });
 
+test('每个非自在选项都有自己的 example（练习页例句跟所挑的那句走）', () => {
+  for (const m of XH.moments) {
+    for (const o of m.options) {
+      if (o.mode === 'free') continue;
+      assert.ok(typeof o.example === 'string' && o.example.trim().length > 0, m.id + ' 缺 example：' + o.text);
+      assert.ok(o.example.length <= 40, m.id + ' example 太长：' + o.example);
+    }
+  }
+});
+
+test('v2 新键都在，share 模板九个占位齐全，封面不再说「选了不能改」', () => {
+  for (const k of ['introSub', 'firstHint', 'tagline', 'introMeta']) assert.ok(XH[k], '缺 ' + k);
+  for (const k of ['how', 'note', 'exampleLead', 'placeholder']) assert.ok(XH.practice[k], '缺 practice.' + k);
+  assert.equal(XH.numerals.length, 7, 'numerals 要覆盖 0 到 6');
+  for (const k of ['dominantTie', 'goodnight', 'psLead', 'said', 'rewrote', 'skipped', 'share']) assert.ok(XH.diary[k], '缺 diary.' + k);
+  assert.ok(XH.diary.tomorrow.tie, '缺 tomorrow.tie');
+  for (const p of ['date', 'lines', 'tally', 'dominant', 'practice', 'goodnight', 'psLead', 'tomorrow', 'url']) {
+    assert.ok(XH.diary.share.includes('{' + p + '}'), 'share 缺占位 ' + p);
+  }
+  assert.ok(!/选了不能改/.test(XH.tagline + XH.introSub + XH.introMeta + XH.firstHint), '封面不该再说选了不能改');
+  assert.equal(XH.modes.free.face, 'calm', '自在的脸不该是 happy');
+});
+
 test('文案里没有破折号与 emoji', () => {
   const s = JSON.stringify(XH);
   assert.ok(!/—/.test(s), '有破折号');

@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <title>小孩日记</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="过一遍普通的一天。睡前，看看你心里那个小孩怎么写今天。">
+<meta name="description" content="把你今天对自己说过的话，换一个人念给你听。过一遍普通的一天，六个时刻，各选一句心里先冒出来的话。夜里，你心里那个小孩会把这一天写成一篇日记。">
 <meta name="theme-color" content="#141830">
 <meta property="og:type" content="website">
 <meta property="og:title" content="小孩日记">
-<meta property="og:description" content="过一遍普通的一天。睡前，看看你心里那个小孩怎么写今天。">
+<meta property="og:description" content="把你今天对自己说过的话，换一个人念给你听。过一遍普通的一天，六个时刻，各选一句心里先冒出来的话。夜里，你心里那个小孩会把这一天写成一篇日记。">
 <meta property="og:image" content="https://xiaohai-riji.vercel.app/og.jpg">
 <meta property="og:url" content="https://xiaohai-riji.vercel.app/">
 <meta name="twitter:card" content="summary_large_image">
@@ -19,6 +19,7 @@
   --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", sans-serif;
   --amber: #ffb000;
   --amber2: #ff9500;
+  --night2: #1c2541;
 }
 body {
   --fg: #1f2030;
@@ -27,16 +28,17 @@ body {
   --card: rgba(255, 255, 255, .38);
   --field: rgba(255, 255, 255, .55);
 }
+/* 暗天色：卡片用有遮盖力的深色半透明底，浅字压在亮端上也够看 */
 body.dark {
   --fg: #f3efe6;
-  --fg2: rgba(243, 239, 230, .72);
+  --fg2: rgba(243, 239, 230, .86);
   --line: rgba(243, 239, 230, .3);
-  --card: rgba(255, 255, 255, .09);
+  --card: rgba(15, 14, 24, .45);
   --field: rgba(255, 255, 255, .1);
 }
 body.paper {
   --fg: #2a2622;
-  --fg2: #7a7168;
+  --fg2: #6f665d;
   --line: rgba(42, 38, 34, .22);
   --card: rgba(255, 255, 255, .6);
   --field: rgba(255, 255, 255, .7);
@@ -53,9 +55,11 @@ body {
 .sky { position: fixed; inset: 0; z-index: -1; opacity: 0; transition: opacity .7s ease; background: #141830; }
 .sky.show { opacity: 1; }
 #app {
+  --pad: 20px;
+  --padb: 30px;
   max-width: 520px;
   margin: 0 auto;
-  padding: 22px 20px 30px;
+  padding: 22px var(--pad) var(--padb);
   box-sizing: border-box;
   min-height: 100vh;
   min-height: 100dvh;
@@ -93,19 +97,29 @@ body {
   cursor: pointer;
   transition: background .15s, border-color .15s, opacity .15s;
 }
-.btn:hover { border-color: var(--fg); }
 .btn.primary { background: var(--amber); border-color: var(--amber); color: #1b1b1b; font-weight: 600; }
-.btn.primary:hover { background: var(--amber2); border-color: var(--amber2); }
 .btn.big { padding: 15px 34px; font-size: 17px; }
 .btn.small { padding: 7px 13px; font-size: 13px; }
 .btn:disabled { opacity: .4; cursor: default; }
-.btn:focus-visible, .opt:focus-visible, .link:focus-visible, textarea:focus-visible, summary:focus-visible {
+/* 「下一刻」晚一点出现，出现时也是淡入 */
+.btn.late { opacity: 0; transition: opacity .4s, background .15s, border-color .15s; }
+.btn.late.in { opacity: 1; }
+.btn:focus-visible, .opt:focus-visible, .pick:focus-visible, .datebtn:focus-visible, .link:focus-visible, textarea:focus-visible, summary:focus-visible {
   outline: 2px solid var(--amber); outline-offset: 3px;
 }
 .link {
-  background: none; border: 0; padding: 4px 2px;
+  background: none; border: 0; padding: 10px 2px; min-height: 44px;
   color: var(--fg2); font: inherit; font-size: 14px;
   text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
+/* hover 发亮只给真有鼠标的设备；触屏上点过的按钮不能像被选中 */
+@media (hover: hover) {
+  .btn:hover:not(:disabled) { border-color: var(--fg); }
+  .btn.primary:hover:not(:disabled) { background: var(--amber2); border-color: var(--amber2); }
+  .opt:hover:not(:disabled) { border-color: var(--fg); }
+  .pick:hover:not(:disabled) { border-color: var(--fg); }
+  .datebtn:hover:not(:disabled) { border-color: var(--fg); color: var(--fg); }
+  .link:hover { color: var(--fg); }
 }
 
 /* 封面 */
@@ -114,19 +128,24 @@ body {
   padding: 28px 0 36px;
   display: flex; flex-direction: column; align-items: center; text-align: center;
 }
-.cover .facepanel { margin-bottom: 30px; }
-.title { font-family: var(--serif); font-weight: 400; font-size: 36px; letter-spacing: .14em; margin: 0 0 16px; }
+.cover .facepanel { margin-bottom: 26px; }
+.title { font-family: var(--serif); font-weight: 400; font-size: 36px; letter-spacing: .14em; margin: 0 0 14px; }
 .tagline { font-family: var(--serif); font-size: 17px; line-height: 1.9; margin: 0 0 12px; max-width: 22em; }
-.meta { font-size: 13px; line-height: 1.8; color: var(--fg2); margin: 0 0 30px; max-width: 24em; }
-.cover .link { margin-top: 20px; }
+/* 封面说明：tagline 之下讲怎么玩，meta 讲它不是什么 */
+.sub { font-size: 14px; line-height: 1.85; color: var(--fg); opacity: .88; margin: 0 0 10px; max-width: 24em; }
+.meta { font-size: 13px; line-height: 1.8; color: var(--fg2); margin: 0 0 28px; max-width: 24em; }
+.cover .link { margin-top: 12px; }
 
 /* 页脚与说明 */
-.foot { margin-top: auto; padding-top: 34px; font-size: 12.5px; line-height: 1.75; color: var(--fg2); }
+.foot { margin-top: auto; padding-top: 34px; font-size: 13px; line-height: 1.75; color: var(--fg2); }
 .foot p { margin: 0 0 8px; }
 .foot a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .about { margin: 0 0 10px; }
-.about summary { cursor: pointer; padding: 4px 0; }
+.about summary { cursor: pointer; padding: 10px 0; }
 .about p { margin: 10px 0 0; }
+.foot.one { padding-top: 26px; }
+.foot.one .about { margin: 0; }
+.foot.one .credit { margin-top: 14px; }
 
 /* 时刻页 */
 .top { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 24px; }
@@ -138,10 +157,14 @@ body {
 .dots i.now { background: var(--amber); }
 .scene { font-family: var(--serif); font-size: 19px; line-height: 1.9; margin: 0 0 22px; }
 .q { font-size: 14px; color: var(--fg2); margin: 0 0 12px; }
+/* 只在第一个时刻出现一次的小字 */
+.qhint { font-size: 13px; line-height: 1.7; color: var(--fg2); margin: -6px 0 12px; }
+/* 暗天色上问句直接压在渐变上，没有卡片底，用主文字色才够 4.5:1 */
+body.dark .q, body.dark .qhint { color: var(--fg); opacity: .94; }
 .opts { display: flex; flex-direction: column; gap: 10px; }
 .opt {
   display: flex; gap: 12px; align-items: baseline;
-  width: 100%; text-align: left;
+  width: 100%; box-sizing: border-box; text-align: left;
   font: inherit; font-size: 16px; line-height: 1.55;
   padding: 12px 14px;
   border-radius: 12px; border: 1px solid var(--line);
@@ -149,8 +172,7 @@ body {
   cursor: pointer;
   transition: opacity .15s, border-color .15s, box-shadow .15s;
 }
-.opt .n { flex: 0 0 auto; font-family: var(--serif); font-size: 12px; color: var(--fg2); opacity: .6; }
-.opt:hover:not(:disabled) { border-color: var(--fg); }
+.opt .n { flex: 0 0 auto; font-family: var(--serif); font-size: 12px; color: var(--fg); opacity: .8; }
 .opt:disabled { cursor: default; }
 .opt.faded { opacity: .3; }
 .opt.chosen { border-color: var(--amber); box-shadow: inset 0 0 0 1px var(--amber); }
@@ -158,52 +180,74 @@ body {
 .noted.in { opacity: 1; transform: none; }
 .noted .lbl { font-size: 12px; letter-spacing: .24em; color: var(--fg2); margin-bottom: 8px; }
 .noted .dline { font-family: var(--serif); font-size: 17px; line-height: 1.85; margin: 0; padding-left: 12px; border-left: 2px solid var(--amber); }
+body.dark .noted { background: var(--card); padding: 12px 14px; border-radius: 12px; }
 .actions { margin-top: 22px; display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
 
 /* 练习页 */
-.practice h2 { font-family: var(--serif); font-weight: 400; font-size: 24px; letter-spacing: .1em; margin: 8px 0 12px; }
-.lead { font-family: var(--serif); font-size: 17px; line-height: 1.9; margin: 0 0 22px; }
-.picks { display: flex; flex-direction: column; gap: 10px; }
+.practice .top { margin-bottom: 14px; }
+.practice h2 { font-family: var(--serif); font-weight: 400; font-size: 24px; letter-spacing: .1em; margin: 0; }
+.lead { font-family: var(--serif); font-size: 17px; line-height: 1.85; margin: 0 0 10px; }
+.how { font-size: 13.5px; line-height: 1.75; color: var(--fg2); margin: 0 0 14px; }
+.picks { display: flex; flex-direction: column; gap: 8px; }
 .pick {
   display: flex; align-items: center; gap: 10px;
-  padding: 10px 10px 10px 14px;
+  width: 100%; box-sizing: border-box; min-height: 46px; text-align: left; /* 44 是底线，留 2px 给亚像素舍入 */
+  padding: 8px 10px 8px 14px;
+  font: inherit; color: var(--fg); cursor: pointer;
   border: 1px solid var(--line); border-radius: 12px; background: var(--card);
   transition: opacity .3s, border-color .3s;
 }
 .pick .ptime { flex: 0 0 auto; font-size: 12px; color: var(--fg2); font-variant-numeric: tabular-nums; }
-.pick .ptext { flex: 1; font-family: var(--serif); font-size: 16px; line-height: 1.6; }
-.pick.faded { opacity: .35; }
+.pick .ptext { flex: 1; font-family: var(--serif); font-size: 16px; line-height: 1.5; }
+.pick .pgo { flex: 0 0 auto; font-size: 12px; color: var(--fg2); border: 1px solid var(--line); border-radius: 999px; padding: 4px 9px; white-space: nowrap; }
+.pick.faded { opacity: .5; }
 .pick.chosen { border-color: var(--amber); }
-.detail { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
-.hint { font-size: 15px; line-height: 1.85; margin: 0 0 12px; }
-.example { font-family: var(--serif); font-size: 16px; line-height: 1.8; margin: 0 0 14px; padding-left: 12px; border-left: 2px solid var(--amber); }
+.pick.chosen .pgo { color: #1b1b1b; background: var(--amber); border-color: var(--amber); }
+.pnote { font-size: 12.5px; line-height: 1.7; color: var(--fg2); margin: 10px 0 0; }
+.detail { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); scroll-margin-bottom: 96px; }
+.hint { font-size: 14.5px; line-height: 1.75; margin: 0 0 10px; }
+.example { font-family: var(--serif); font-size: 16px; line-height: 1.7; margin: 0 0 12px; padding-left: 12px; border-left: 2px solid var(--amber); }
+.example .exlead { display: block; font-family: var(--sans); font-size: 12px; color: var(--fg2); margin-bottom: 2px; }
 textarea {
   width: 100%; box-sizing: border-box;
   font: inherit; font-family: var(--serif); font-size: 16px; line-height: 1.7;
-  padding: 12px 14px; min-height: 92px; resize: vertical;
+  padding: 10px 12px; min-height: 0; resize: vertical;
   border-radius: 12px; border: 1px solid var(--line);
   background: var(--field); color: var(--fg);
 }
 textarea::placeholder { color: var(--fg2); }
-.practice .actions { justify-content: space-between; }
+/* 两个按钮贴底：句子再多、屏再小，「改好了」「今天先不改」都在视口里 */
+.practice .actions {
+  position: sticky; bottom: 0; z-index: 1;
+  justify-content: space-between;
+  margin: auto calc(-1 * var(--pad)) calc(-1 * var(--padb));
+  padding: 14px var(--pad) calc(14px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, rgba(28, 37, 65, 0), var(--night2) 45%);
+}
+.practice .detail + .actions { margin-top: 10px; }
 
 /* 日记页 */
 .dhead { display: flex; align-items: center; gap: 16px; margin-bottom: 26px; }
 .dhead h2 { font-family: var(--serif); font-weight: 400; font-size: 26px; letter-spacing: .12em; margin: 0; }
 .dhead .date { font-family: var(--serif); font-size: 14px; letter-spacing: .06em; color: var(--fg2); margin-top: 4px; }
+.dates { display: flex; flex-wrap: wrap; gap: 8px; margin: -10px 0 22px; }
+.datebtn {
+  font: inherit; font-family: var(--serif); font-size: 13px; letter-spacing: .04em;
+  padding: 5px 11px; border-radius: 999px;
+  border: 1px solid var(--line); background: transparent; color: var(--fg2); cursor: pointer;
+}
+.datebtn.now { border-color: var(--amber); color: var(--fg); background: var(--card); opacity: 1; cursor: default; }
 .entry { font-family: var(--serif); font-size: 17px; line-height: 1.95; }
 .entry .line { display: flex; gap: 12px; margin: 0 0 12px; }
-.entry .line time { flex: 0 0 auto; font-family: var(--sans); font-size: 12px; letter-spacing: .04em; color: #9a9088; padding-top: .5em; font-variant-numeric: tabular-nums; }
+.entry .line time { flex: 0 0 auto; font-family: var(--sans); font-size: 12px; letter-spacing: .04em; color: var(--fg2); padding-top: .5em; font-variant-numeric: tabular-nums; }
 .entry .close { margin-top: 22px; padding-top: 18px; border-top: 1px dashed var(--line); }
 .entry .close p { margin: 0 0 8px; }
 .entry .sign { text-align: right; margin: 18px 0 0; color: var(--fg2); }
-.card { margin-top: 30px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
-.card h3 { margin: 0 0 8px; font-size: 12px; letter-spacing: .24em; font-weight: 500; color: var(--fg2); }
-.card p { margin: 0; font-family: var(--serif); font-size: 16px; line-height: 1.85; }
-.diary .actions { justify-content: flex-start; margin-top: 26px; }
+.entry .ps { margin: 16px 0 0; font-size: 15px; line-height: 1.85; color: var(--fg2); }
+.diary .actions { justify-content: flex-start; margin-top: 22px; }
 
 @media (min-width: 600px) {
-  #app { padding: 44px 24px 48px; }
+  #app { --pad: 24px; --padb: 48px; padding: 44px var(--pad) var(--padb); }
   .scene { font-size: 20px; }
   .title { font-size: 40px; }
 }
@@ -219,7 +263,9 @@ textarea::placeholder { color: var(--fg2); }
   <section class="screen cover">
     <div class="cover-main">
       <h1 class="title">小孩日记</h1>
-      <p class="tagline">过一遍普通的一天。睡前，看看你心里那个小孩怎么写今天。</p>
+      <p class="tagline">把你今天对自己说过的话，换一个人念给你听。</p>
+      <p class="sub">过一遍普通的一天，六个时刻，各选一句心里先冒出来的话。夜里，你心里那个小孩会把这一天写成一篇日记。</p>
+      <p class="meta">五分钟。不是测评，不打分，什么都不会上传。</p>
       <noscript><p class="meta">这页需要打开 JavaScript 才能过这一天。</p></noscript>
     </div>
   </section>

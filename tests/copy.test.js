@@ -49,6 +49,15 @@ test('index.html 可见文案，去腔 strong 命中为 0', () => {
   assert.equal(res.strong.length, 0, '\n' + report(res));
 });
 
+test('app.js 只写一个存储 key：xh.diaries（v1 的 xh.diary 只读不写）', () => {
+  const s = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.match(s, /const KEY = 'xh\.diaries'/, '存储 key 应是 xh.diaries');
+  const sets = s.match(/localStorage\.setItem\([^,]+,/g) || [];
+  assert.ok(sets.length >= 1, '应有写存档的地方');
+  sets.forEach((x) => assert.ok(/setItem\(KEY,/.test(x), '写了别的 key：' + x));
+  assert.ok(!/sharePractice|tomorrowTitle/.test(s), '不该再引用已删除的键');
+});
+
 test('index.html 与 app.js 里没有破折号、emoji 与外部请求', () => {
   const root = path.join(__dirname, '..');
   for (const f of ['index.html', 'app.js']) {
