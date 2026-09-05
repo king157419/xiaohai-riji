@@ -45,7 +45,7 @@ test('穷举 4096 种选法：说「最常做的是 X」时 X 严格大于其余
       else if (dom === 'mixed') { seen.mixed++; assert.ok(t.free < 4 && t.free >= maxHarsh, 'mixed 要自在不到四次且不少于任何重话：' + JSON.stringify(t)); }
       else if (dom === 'tie') {
         seen.tie++;
-        assert.ok(t.free < maxHarsh, 'tie 时自在必须少于最多的重话：' + JSON.stringify(t));
+        assert.ok(t.free < 4, 'tie 时自在不到四次（重话之间打平先算打平，再看自在）：' + JSON.stringify(t));
         assert.ok(HARSH.filter((k) => t[k] === maxHarsh).length >= 2, 'tie 时最多的重话至少两种：' + JSON.stringify(t));
       } else assert.fail('未知分支：' + dom);
     }
