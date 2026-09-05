@@ -55,8 +55,10 @@
       if (best === null || t[k] > t[best]) { best = k; tie = false; }
       else if (t[k] === t[best]) tie = true;
     });
-    if (best === null || t.free >= t[best]) return 'mixed';
-    return tie ? 'tie' : best;
+    if (best === null) return 'mixed';
+    if (tie) return 'tie'; // 重话之间打平（含六种各一次）先算打平，再看自在
+    if (t.free >= t[best]) return 'mixed';
+    return best;
   }
   function dominantText(dom) {
     if (dom === 'freeAll') return C.diary.dominantFreeAll;
