@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <title>小孩日记</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="把你今天对自己说过的话，换一个人念给你听。过一遍普通的一天，六个时刻，各选一句心里先冒出来的话。夜里，你心里那个小孩会把这一天写成一篇日记。">
+<meta name="description" content="把你今天对自己说过的话，换一个人念给你听。过一遍普通的一天，六个时刻，各选一句心里先冒出来的话。夜里，你心里那个小孩会把它写成一篇日记。">
 <meta name="theme-color" content="#141830">
 <meta property="og:type" content="website">
 <meta property="og:title" content="小孩日记">
-<meta property="og:description" content="把你今天对自己说过的话，换一个人念给你听。过一遍普通的一天，六个时刻，各选一句心里先冒出来的话。夜里，你心里那个小孩会把这一天写成一篇日记。">
+<meta property="og:description" content="把你今天对自己说过的话，换一个人念给你听。过一遍普通的一天，六个时刻，各选一句心里先冒出来的话。夜里，你心里那个小孩会把它写成一篇日记。">
 <meta property="og:image" content="https://xiaohai-riji.vercel.app/og.jpg">
 <meta property="og:url" content="https://xiaohai-riji.vercel.app/">
 <meta name="twitter:card" content="summary_large_image">
@@ -69,14 +69,18 @@ body {
 .screen { flex: 1; display: flex; flex-direction: column; animation: enter .4s ease both; }
 @keyframes enter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
-/* 像素脸 */
+/* 像素脸。尺寸由 app.js 写进 --fs0（96 或 56），内边距与圆角按 --fs 算；小屏封面在下面的媒体查询里把 --fs 改小 */
 .facepanel {
+  --fs: var(--fs0, 56px);
   display: inline-block;
+  padding: calc(var(--fs) * .16);
+  border-radius: calc(var(--fs) * .22);
   background: #1b1b1b;
   line-height: 0;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06), 0 8px 24px rgba(0, 0, 0, .22);
   flex: 0 0 auto;
 }
+.face { width: var(--fs); height: var(--fs); }
 .face .glow rect { opacity: 0; transition: opacity .2s; }
 .face .glow rect.on { opacity: .6; }
 .face .lit rect { opacity: 0; transition: opacity .2s; }
@@ -95,12 +99,15 @@ body {
   background: var(--card);
   color: var(--fg);
   cursor: pointer;
-  transition: background .15s, border-color .15s, opacity .15s;
+  transition: background .15s, border-color .15s, color .15s, opacity .15s;
 }
 .btn.primary { background: var(--amber); border-color: var(--amber); color: #1b1b1b; font-weight: 600; }
 .btn.big { padding: 15px 34px; font-size: 17px; }
 .btn.small { padding: 7px 13px; font-size: 13px; }
 .btn:disabled { opacity: .4; cursor: default; }
+/* 没写字时的「改好了」：描边加 .7 的文字，不是一块土黄；写了字才填琥珀。按下去之后那 1 秒（.sent）保持亮着 */
+.btn.primary:disabled { background: transparent; border-color: var(--line); color: var(--fg); opacity: .7; }
+.btn.primary.sent:disabled { background: var(--amber); border-color: var(--amber); color: #1b1b1b; opacity: 1; }
 /* 「下一刻」晚一点出现，出现时也是淡入 */
 .btn.late { opacity: 0; transition: opacity .4s, background .15s, border-color .15s; }
 .btn.late.in { opacity: 1; }
@@ -134,7 +141,19 @@ body {
 /* 封面说明：tagline 之下讲怎么玩，meta 讲它不是什么 */
 .sub { font-size: 14px; line-height: 1.85; color: var(--fg); opacity: .88; margin: 0 0 10px; max-width: 24em; }
 .meta { font-size: 13px; line-height: 1.8; color: var(--fg2); margin: 0 0 28px; max-width: 24em; }
+/* 两段字都断出过「听。」「记。」的单字孤行：先要 pretty（不支持 balance 时的退路），支持的话 balance 盖过它 */
+.tagline, .sub { text-wrap: pretty; text-wrap: balance; }
 .cover .link { margin-top: 12px; }
+/* 375×667、360×640 这种矮屏：脸缩到 56，间距收一收，封面回到一屏内 */
+@media (max-height: 700px) {
+  #app { padding-top: 14px; }
+  .cover .cover-main { padding: 10px 0 18px; }
+  .cover .facepanel { --fs: 56px; margin-bottom: 16px; }
+  .title { font-size: 32px; margin-bottom: 8px; }
+  .tagline { margin-bottom: 8px; }
+  .meta { margin-bottom: 20px; }
+  .cover .foot { padding-top: 18px; }
+}
 
 /* 页脚与说明 */
 .foot { margin-top: auto; padding-top: 34px; font-size: 13px; line-height: 1.75; color: var(--fg2); }
@@ -143,9 +162,7 @@ body {
 .about { margin: 0 0 10px; }
 .about summary { cursor: pointer; padding: 10px 0; }
 .about p { margin: 10px 0 0; }
-.foot.one { padding-top: 26px; }
-.foot.one .about { margin: 0; }
-.foot.one .credit { margin-top: 14px; }
+.diary .foot { padding-top: 26px; }
 
 /* 时刻页 */
 .top { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 24px; }
@@ -216,15 +233,24 @@ textarea {
   background: var(--field); color: var(--fg);
 }
 textarea::placeholder { color: var(--fg2); }
-/* 两个按钮贴底：句子再多、屏再小，「改好了」「今天先不改」都在视口里 */
+/* 两个按钮贴底：句子再多、屏再小，「改好了」「今天先不改」都在视口里。
+   条子本身不接点击（上半截是透明渐变，底下的句子看得见就该点得着）；只有两颗按钮和实心的下半截接。 */
 .practice .actions {
   position: sticky; bottom: 0; z-index: 1;
   justify-content: space-between;
   margin: auto calc(-1 * var(--pad)) calc(-1 * var(--padb));
   padding: 14px var(--pad) calc(14px + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(180deg, rgba(28, 37, 65, 0), var(--night2) 45%);
+  pointer-events: none;
 }
+.practice .actions::after { content: ''; position: absolute; left: 0; right: 0; top: 45%; bottom: 0; z-index: -1; pointer-events: auto; }
+.practice .actions .btn { pointer-events: auto; }
 .practice .detail + .actions { margin-top: 10px; }
+/* 桌面：内容栏不会撑满高度，不用贴底；条子和内容栏同宽，底色就是天色 */
+@media (min-width: 600px) {
+  .practice .actions { position: static; margin: 22px 0 0; padding: 0; background: none; }
+  .practice .actions::after { content: none; }
+}
 
 /* 日记页 */
 .dhead { display: flex; align-items: center; gap: 16px; margin-bottom: 26px; }
@@ -232,8 +258,8 @@ textarea::placeholder { color: var(--fg2); }
 .dhead .date { font-family: var(--serif); font-size: 14px; letter-spacing: .06em; color: var(--fg2); margin-top: 4px; }
 .dates { display: flex; flex-wrap: wrap; gap: 8px; margin: -10px 0 22px; }
 .datebtn {
-  font: inherit; font-family: var(--serif); font-size: 13px; letter-spacing: .04em;
-  padding: 5px 11px; border-radius: 999px;
+  font: inherit; font-family: var(--serif); font-size: 13px; letter-spacing: .04em; font-variant-numeric: tabular-nums;
+  min-height: 36px; padding: 6px 12px; border-radius: 999px;
   border: 1px solid var(--line); background: transparent; color: var(--fg2); cursor: pointer;
 }
 .datebtn.now { border-color: var(--amber); color: var(--fg); background: var(--card); opacity: 1; cursor: default; }
@@ -264,7 +290,7 @@ textarea::placeholder { color: var(--fg2); }
     <div class="cover-main">
       <h1 class="title">小孩日记</h1>
       <p class="tagline">把你今天对自己说过的话，换一个人念给你听。</p>
-      <p class="sub">过一遍普通的一天，六个时刻，各选一句心里先冒出来的话。夜里，你心里那个小孩会把这一天写成一篇日记。</p>
+      <p class="sub">过一遍普通的一天，六个时刻，各选一句心里先冒出来的话。夜里，你心里那个小孩会把它写成一篇日记。</p>
       <p class="meta">五分钟。不是测评，不打分，什么都不会上传。</p>
       <noscript><p class="meta">这页需要打开 JavaScript 才能过这一天。</p></noscript>
     </div>

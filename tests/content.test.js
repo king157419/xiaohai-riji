@@ -51,17 +51,24 @@ test('每个非自在选项都有自己的 example（练习页例句跟所挑的
   }
 });
 
-test('v2 新键都在，share 模板九个占位齐全，封面不再说「选了不能改」', () => {
+test('v2、v3 新键都在，share 模板十个占位齐全且末两行是致谢与网址，封面不再说「选了不能改」', () => {
   for (const k of ['introSub', 'firstHint', 'tagline', 'introMeta']) assert.ok(XH[k], '缺 ' + k);
-  for (const k of ['how', 'note', 'exampleLead', 'placeholder']) assert.ok(XH.practice[k], '缺 practice.' + k);
+  for (const k of ['how', 'note', 'exampleLead', 'placeholder', 'placeholderAllFree', 'doneAllFree', 'skipAllFree']) assert.ok(XH.practice[k], '缺 practice.' + k);
   assert.equal(XH.numerals.length, 7, 'numerals 要覆盖 0 到 6');
-  for (const k of ['dominantTie', 'goodnight', 'psLead', 'said', 'rewrote', 'skipped', 'share']) assert.ok(XH.diary[k], '缺 diary.' + k);
+  for (const k of ['dominantTie', 'dominantMixed', 'dominantFreeAll', 'goodnight', 'psLead', 'said', 'rewrote', 'skipped', 'skippedAllFree', 'share', 'shareCredit']) {
+    assert.ok(XH.diary[k], '缺 diary.' + k);
+  }
+  for (const k of ['credit', 'maker', 'freshNote', 'gallery']) assert.ok(XH.about[k], '缺 about.' + k);
   assert.ok(XH.diary.tomorrow.tie, '缺 tomorrow.tie');
-  for (const p of ['date', 'lines', 'tally', 'dominant', 'practice', 'goodnight', 'psLead', 'tomorrow', 'url']) {
+  for (const p of ['date', 'lines', 'tally', 'dominant', 'practice', 'goodnight', 'psLead', 'tomorrow', 'credit', 'url']) {
     assert.ok(XH.diary.share.includes('{' + p + '}'), 'share 缺占位 ' + p);
   }
+  assert.ok(XH.diary.share.endsWith('\n{credit}\n{url}'), 'share 末两行应是致谢与裸网址');
+  assert.ok(!/过一天试试/.test(XH.diary.share), 'share 不该再有「过一天试试」');
   assert.ok(!/选了不能改/.test(XH.tagline + XH.introSub + XH.introMeta + XH.firstHint), '封面不该再说选了不能改');
+  assert.ok(/选了就不改了/.test(XH.firstHint), 'firstHint 要说选了就不改了');
   assert.equal(XH.modes.free.face, 'calm', '自在的脸不该是 happy');
+  for (const k of ['dominantTie', 'dominantMixed', 'dominantFreeAll']) assert.ok(!/最常/.test(XH.diary[k]), k + ' 不该说「最常」');
 });
 
 test('文案里没有破折号与 emoji', () => {
