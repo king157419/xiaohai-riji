@@ -137,7 +137,7 @@
   const T_NEXT = REDUCED ? 0 : 1300;
   const T_HAPPY = 1000;
   const SKY = {
-    cover: { colors: ['#141830', '#2b2d4a'], dark: true },
+    cover: { colors: ['#f5efe0', '#efe3d0'], paper: true },
     night: { colors: ['#0b1020', '#1c2541'], dark: true },
     paper: { colors: ['#f6f1e7', '#efe6d6'], dark: false, paper: true }
   };
@@ -351,13 +351,11 @@
     state = newState();
     current = null;
     setSky(SKY.cover);
-    const face = makeFace(96);
-    face.set('calm');
-    face.el.classList.add('breath');
     const saved = readAll();
     const sec = h('section', { class: 'screen cover' }, [
       h('div', { class: 'cover-main' }, [
-        face.el,
+        h('img', { class: 'cover-illus', src: 'art/cover.jpg', width: '760', height: '1140',
+          alt: '一个小孩坐在窗边，窗台上一盏小灯亮着琥珀色的笑脸，陪着他', loading: 'eager', decoding: 'async' }),
         h('h1', { class: 'title' }, C.title),
         h('p', { class: 'tagline' }, C.tagline),
         h('p', { class: 'sub' }, C.introSub),

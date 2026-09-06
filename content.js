@@ -35,7 +35,7 @@
     moments: [
       {
         id: 'wake', time: '07:40', name: '起床',
-        sky: ['#2b2d4a', '#c9786f'], dark: true,
+        sky: ['#3f3d63', '#d98f79'], dark: true,
         scene: '闹钟响之前你就醒了。手机上有一条消息，是带你的那个人发的：「有空来一下。」没有别的字。',
         options: [
           { text: '完了，肯定是上次那件事出问题了。', mode: 'scare',
@@ -107,7 +107,7 @@
       },
       {
         id: 'talk', time: '20:30', name: '晚上',
-        sky: ['#6b4b7a', '#c86a4a'], dark: true,
+        sky: ['#7a5a86', '#d17e5a'], dark: true,
         scene: '今天不太顺，你想找人说说。你打开了和最亲近的那个人的对话框，光标在闪。',
         options: [
           { text: '算了，说了也是打扰人家。', mode: 'refuse',
@@ -125,7 +125,7 @@
       },
       {
         id: 'bed', time: '23:40', name: '睡前',
-        sky: ['#0b1020', '#1c2541'], dark: true,
+        sky: ['#1c2444', '#33406b'], dark: true,
         scene: '灯关了。今天有件事没做好：一句说错的话，或者一次迟到。画面自己回来了。',
         options: [
           { text: '我怎么总是这样。', mode: 'deny',

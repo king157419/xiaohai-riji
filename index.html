@@ -5,7 +5,7 @@
 <title>小孩日记</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="把你今天对自己说过的话，换一个人念给你听。过一遍普通的一天，六个时刻，各选一句心里先冒出来的话。夜里，你心里那个小孩会把它写成一篇日记。">
-<meta name="theme-color" content="#141830">
+<meta name="theme-color" content="#f5efe0">
 <meta property="og:type" content="website">
 <meta property="og:title" content="小孩日记">
 <meta property="og:description" content="把你今天对自己说过的话，换一个人念给你听。过一遍普通的一天，六个时刻，各选一句心里先冒出来的话。夜里，你心里那个小孩会把它写成一篇日记。">
@@ -52,7 +52,7 @@ body {
   transition: color .4s;
   -webkit-tap-highlight-color: transparent;
 }
-.sky { position: fixed; inset: 0; z-index: -1; opacity: 0; transition: opacity .7s ease; background: #141830; }
+.sky { position: fixed; inset: 0; z-index: -1; opacity: 0; transition: opacity .7s ease; background: #f5efe0; }
 .sky.show { opacity: 1; }
 #app {
   --pad: 20px;
@@ -136,6 +136,17 @@ body {
   display: flex; flex-direction: column; align-items: center; text-align: center;
 }
 .cover .facepanel { margin-bottom: 26px; }
+/* 封面插画：像纸上摆着的一张画，圆角加一层柔和投影；用 max-height 收住，矮屏也不撑破 */
+.cover-illus {
+  display: block; width: auto; height: auto;
+  max-width: min(320px, 78vw); max-height: 44vh;
+  margin: 0 auto 22px; border-radius: 16px;
+  box-shadow: 0 10px 34px rgba(60, 44, 28, .18);
+}
+/* 手机竖屏：插画收一收，让「开始这一天」留在首屏内 */
+@media (max-width: 480px) {
+  .cover-illus { max-width: 60vw; max-height: 40vh; margin-bottom: 16px; }
+}
 .title { font-family: var(--serif); font-weight: 400; font-size: 36px; letter-spacing: .14em; margin: 0 0 14px; }
 .tagline { font-family: var(--serif); font-size: 17px; line-height: 1.9; margin: 0 0 12px; max-width: 22em; }
 /* 封面说明：tagline 之下讲怎么玩，meta 讲它不是什么 */
@@ -149,6 +160,7 @@ body {
   #app { padding-top: 14px; }
   .cover .cover-main { padding: 10px 0 18px; }
   .cover .facepanel { --fs: 56px; margin-bottom: 16px; }
+  .cover-illus { max-height: 34vh; margin-bottom: 14px; border-radius: 12px; }
   .title { font-size: 32px; margin-bottom: 8px; }
   .tagline { margin-bottom: 8px; }
   .meta { margin-bottom: 20px; }
