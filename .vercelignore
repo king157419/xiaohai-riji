@@ -2,3 +2,5 @@ tests
 README.md
 .gitignore
 art/cover-src.png
+art/.omc
+art/.omx
